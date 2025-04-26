@@ -1,0 +1,73 @@
+import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+
+export default function FallRiskAssessment() {
+  const [score, setScore] = useState(0);
+  const [result, setResult] = useState('');
+  const [form, setForm] = useState({
+    ageOver65: false,
+    historyOfFall: false,
+    mobilityImpaired: false,
+    medicationAffects: false,
+    cognitiveImpairment: false
+  });
+
+  const handleChange = (field) => {
+    setForm((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const calculateScore = () => {
+    let total = 0;
+    if (form.ageOver65) total += 2;
+    if (form.historyOfFall) total += 3;
+    if (form.mobilityImpaired) total += 2;
+    if (form.medicationAffects) total += 2;
+    if (form.cognitiveImpairment) total += 3;
+    setScore(total);
+
+    if (total >= 7) setResult('고위험');
+    else if (total >= 4) setResult('중등도 위험');
+    else setResult('저위험');
+  };
+
+  return (
+    <div className="max-w-xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4">입원환자 낙상위험도 평가</h1>
+      <Card>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>65세 이상</Label>
+            <Switch checked={form.ageOver65} onCheckedChange={() => handleChange('ageOver65')} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>최근 낙상 경험</Label>
+            <Switch checked={form.historyOfFall} onCheckedChange={() => handleChange('historyOfFall')} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>보행/이동 장애</Label>
+            <Switch checked={form.mobilityImpaired} onCheckedChange={() => handleChange('mobilityImpaired')} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>약물 영향(수면제, 진정제 등)</Label>
+            <Switch checked={form.medicationAffects} onCheckedChange={() => handleChange('medicationAffects')} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>인지장애</Label>
+            <Switch checked={form.cognitiveImpairment} onCheckedChange={() => handleChange('cognitiveImpairment')} />
+          </div>
+          <Button className="w-full" onClick={calculateScore}>평가하기</Button>
+          {result && (
+            <div className="text-center mt-4">
+              <p className="text-lg font-semibold">총점: {score}점</p>
+              <p className="text-xl font-bold text-blue-600">위험도: {result}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
